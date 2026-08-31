@@ -126,5 +126,21 @@ See **`FUTURE_UPGRADE.md`** for the full wishlist. Status highlights:
 - Commit messages: short imperative, matching existing style (e.g. "Add
   PyInstaller spec, build scripts, CI workflow, and docs"). Only commit/push
   when explicitly asked.
-- The next expected release bump is from `0.2.0`. Keep `__version__` in
-  `ost/__init__.py` and `version` in `pyproject.toml` in sync.
+- Keep `__version__` in `ost/__init__.py` and `version` in `pyproject.toml` in
+  sync, and keep the README's release examples current.
+
+## Releasing (how binaries become downloadable)
+
+Pushing to `main` builds the executables as **workflow artifacts only** (14-day
+retention, no download links). A **GitHub Release with downloadable assets** is
+only created when a `v*` tag is pushed — that triggers the `release` job
+(`softprops/action-gh-release`) which publishes `ost-linux-x86_64`,
+`ost-windows-x86_64.exe`, `ost-macos`, and the wheel. The `release` job is gated
+by `if: startsWith(github.ref, 'refs/tags/')` in `.github/workflows/build.yml`.
+
+To ship a release after bumping the version:
+```bash
+git tag -a v0.2.0 -m "Release v0.2.0: ..."
+git push origin v0.2.0
+```
+Latest release (v0.2.0): `https://github.com/mdshakibulhassan2829-cmd/ost/releases/tag/v0.2.0`.
