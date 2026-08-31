@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """OST - Office Suite Toolkit starter.
 
-Run the rich terminal UI with no arguments, or use any CLI subcommand:
+Run with no arguments to choose your interface (TUI / WEB / GUI-coming-soon),
+or use any CLI subcommand directly:
 
-    python main.py              # modern TUI
+    python main.py              # interface chooser
+    python main.py tui          # terminal UI
+    python main.py web          # web interface in the browser
     python main.py list         # list suites (with OS availability)
     python main.py check all    # check latest versions online
-    python main.py tui          # TUI again
 
 Equivalent to:  python -m ost
 """

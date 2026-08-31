@@ -22,6 +22,25 @@ class InstallResult:
     instructions: str = ""
 
 
+def privilege_notice(suite_name: str, plat: str | None = None) -> str:
+    """User-facing notice shown before an install that needs elevated rights."""
+    plat = plat or current_platform()
+    if plat == "windows":
+        return (
+            f"We are requesting administrator permission to install {suite_name}.\n"
+            "A User Account Control (UAC) prompt may appear - please click Yes to continue."
+        )
+    if plat == "macos":
+        return (
+            f"We are requesting administrator permission to install {suite_name}.\n"
+            "You may be asked for your user password - please allow the install to continue."
+        )
+    return (
+        f"We are requesting root (sudo) permission to install {suite_name}.\n"
+        "A password prompt may appear in the terminal - please allow the install to continue."
+    )
+
+
 def _nolog(_line: str) -> None:
     pass
 

@@ -11,8 +11,15 @@ from ost.core import (
     current_platform,
     detect_installed,
     downloads_dir,
+    notify,
 )
-from ost.installer import InstallResult, extract_odt_tool, install_artifact, run_odt
+from ost.installer import (
+    InstallResult,
+    extract_odt_tool,
+    install_artifact,
+    privilege_notice,
+    run_odt,
+)
 from ost.net import download
 from ost.providers import get_provider
 
@@ -104,6 +111,14 @@ def install_suite(
     cfg: Optional[dict] = None,
     log: Optional[Callable[[str], None]] = None,
 ) -> InstallResult:
+    def emit(line: str) -> None:
+        if log:
+            log(line)
+
+    provider = get_provider(slug)
+    notice = privilege_notice(provider.name)
+    emit(notice)
+    notify("OST - Office Suite Toolkit", notice.splitlines()[0])
     if slug == "ms-office":
         return run_odt("configure", cfg or {}, log=log)
     if path is None:
@@ -126,6 +141,6 @@ async def update_suite(
     **opts,
 ) -> tuple[InstallResult, Path | None]:
     if slug == "ms-office":
-        return run_odt("configure", cfg or {}, log=log), None
+        return install_suite(slug, cfg=cfg, log=log), None
     path, _asset = await download_suite(slug, progress=progress, **opts)
     return install_suite(slug, path, log=log), path

@@ -139,6 +139,54 @@ def has_cmd(name: str) -> bool:
     return shutil.which(name) is not None
 
 
+def notify(title: str, message: str) -> None:
+    """Best-effort desktop notification. Never raises on any platform."""
+    def _notify_linux() -> None:
+        if has_cmd("notify-send"):
+            subprocess.run(
+                ["notify-send", "--app-name=OST", title, message],
+                capture_output=True,
+                timeout=10,
+            )
+
+    def _notify_macos() -> None:
+        script = (
+            'display notification "'
+            + message.replace('"', '\\"')
+            + '" with title "'
+            + title.replace('"', '\\"')
+            + '"'
+        )
+        subprocess.run(["osascript", "-e", script], capture_output=True, timeout=10)
+
+    def _notify_windows() -> None:
+        t = title.replace("'", "''")
+        m = message.replace("'", "''")
+        ps = (
+            "Add-Type -AssemblyName System.Windows.Forms;"
+            f"$n=New-Object System.Windows.Forms.NotifyIcon;"
+            "$n.Icon=[System.Drawing.SystemIcons]::Information;"
+            f"$n.BalloonTipTitle='{t}';$n.BalloonTipText='{m}';"
+            "$n.Visible=$true;$n.ShowBalloonTip(5000)"
+        )
+        subprocess.run(
+            ["powershell", "-NoProfile", "-Command", ps],
+            capture_output=True,
+            timeout=15,
+        )
+
+    try:
+        if not is_root() or sys.platform == "win32":
+            if sys.platform == "darwin":
+                _notify_macos()
+            elif sys.platform == "win32":
+                _notify_windows()
+            else:
+                _notify_linux()
+    except Exception:
+        pass
+
+
 def run(cmd: list[str], timeout: int = 600) -> subprocess.CompletedProcess:
     return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
 

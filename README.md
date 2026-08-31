@@ -1,7 +1,10 @@
 # OST — Office Suite Toolkit
 
+> by **MD. Shakibul Hassan (Shuvo)**
+
 A terminal tool to **check, download, install and update** office software, always
-fetched from the **official servers** of each vendor:
+fetched from the **official servers** of each vendor — now with a **web interface**
+too, and a graphical UI on the way:
 
 | Suite | Vendor | Official source used |
 |-------|--------|----------------------|
@@ -18,10 +21,18 @@ Customization Tool* — it generates the real `configuration.xml` and drives
 
 ## Quick start
 
+Run with **no arguments** and OST asks which interface you prefer:
+
 ```
-python main.py        # animated terminal UI
-python main.py check all
-python -m ost list
+ost                # choose: 1) Terminal UI  2) Web interface  3) GUI (coming soon)
+```
+
+```
+ost tui            # straight into the terminal UI
+ost web            # open the web interface in your browser (http://127.0.0.1:8765)
+ost list           # normal CLI
+ost check all
+python main.py     # when running from source (same interface chooser)
 ```
 
 ## Install
@@ -49,11 +60,11 @@ download, run, done:
 | Windows (x86_64) | `ost-windows-x86_64.exe` | double-click, or `ost-windows-x86_64.exe list` in a terminal |
 | macOS | `ost-macos` | `chmod +x ost-macos && ./ost-macos` |
 
-Each binary opens the **animated TUI by default** when run with no arguments,
-and behaves as the CLI below when given arguments. macOS users on an
-unsigned-notarized binary may need right-click → Open the first time; Windows
-SmartScreen just needs "More info → Run anyway" (signing can be added later if
-you want it gone).
+Each binary, when run with no arguments, shows the **interface chooser**
+(Terminal UI / Web interface / GUI-coming-soon) and behaves as the CLI below
+when given arguments. macOS users on an unsigned-notarized binary may need
+right-click → Open the first time; Windows SmartScreen just needs
+"More info → Run anyway" (signing can be added later if you want it gone).
 
 ## Android / Termux
 
@@ -137,6 +148,27 @@ as the Microsoft docs describe. If Microsoft hides the direct link from a
 given client, OST tells you to grab the package from the official Microsoft
 Download Center and re-run — it is then picked up automatically.
 
+## Web interface
+
+`ost web` (or `ost-web`, or option 2 of the launcher) serves a local, browser
+based version of everything the TUI does — no extra install. Defaults to
+`http://127.0.0.1:8765`.
+
+```
+ost web                              # local only, zero setup
+ost web --port 9000
+ost web --host 0.0.0.0 --token my-secret    # reach it from phones/LAN devices
+```
+
+- **Check, download, install, update** any suite, with live progress and logs.
+- Full **Microsoft ODT/OCT configurator** (products, channel, language, edition,
+  PIDKEY) with live `configuration.xml` preview and save.
+- Every install/update first notifies you that **root/administrator permission is
+  being requested** for the system (sudo on Linux, UAC on Windows, password on
+  macOS) — follow the system prompt and it finishes the job.
+- The web app needs only the Python standard library (it is bundled inside the
+  single-file binaries too).
+
 ## Data locations (Linux shown)
 
 | What | Where |
@@ -157,6 +189,11 @@ Download Center and re-run — it is then picked up automatically.
   reports the available package but installing it needs an x86_64 machine (or an
   emulator like box64).
 - macOS paths use `ditto` to install `.app` bundles and `installer` for `.pkg`.
+- Installing a suite requests **root/administrator permission** on your system and
+  opens a `sudo` password prompt (Linux), a UAC prompt (Windows) or a password
+  prompt (macOS). OST notifies you first and blocks until you allow it.
+- **Android / Termux**: installs inside the proot need the suite's packages to be
+  installable there; download/check/update and the web UI work fully.
 
 ## License
 

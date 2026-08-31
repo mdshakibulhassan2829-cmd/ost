@@ -3,7 +3,7 @@
 
 Build (from repo root):
     pyinstaller --noconfirm --clean ost.spec
-Entry point is main.py: no arguments -> TUI, otherwise -> CLI.
+Entry point is main.py: no arguments -> interface chooser, otherwise -> CLI.
 """
 from PyInstaller.utils.hooks import collect_all, collect_submodules, copy_metadata
 

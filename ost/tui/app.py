@@ -171,7 +171,10 @@ def _sel(options: list[tuple[str, str]], value: str, id: str) -> Select:
 def _topbar(title: str, sub: str = "") -> Container:
     return Container(
         Label(f"[b]{title}[/b]  [dim]{sub}[/dim]", classes="top-title"),
-        Label(f"[dim]OST v{__version__} · {current_platform()}[/dim]", classes="top-right"),
+        Label(
+            f"[dim]by MD. Shakibul Hassan (Shuvo) · OST v{__version__} · {current_platform()}[/dim]",
+            classes="top-right",
+        ),
         classes="topbar",
     )
 

@@ -6,7 +6,7 @@ import json
 import sys
 from pathlib import Path
 
-from ost import __version__
+from ost import __author__, __version__
 from ost.actions import check_suite, download_suite, install_suite, update_suite
 from ost.core import current_platform, downloads_dir
 from ost.providers import list_providers
@@ -180,7 +180,7 @@ def cmd_oct_info(_args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_tui(_args: argparse.Namespace) -> int:
+def launch_tui() -> int:
     try:
         from ost.tui.app import main as tui_main
     except ImportError as e:
@@ -188,6 +188,21 @@ def cmd_tui(_args: argparse.Namespace) -> int:
         print(f" ({e})")
         return 1
     return tui_main()
+
+
+def cmd_tui(_args: argparse.Namespace) -> int:
+    return launch_tui()
+
+
+def cmd_web(args: argparse.Namespace) -> int:
+    from ost.web import serve
+
+    return serve(host=args.host, port=args.port, token=args.token, open_browser=not args.no_browser)
+
+
+def cmd_gui(_args: argparse.Namespace) -> int:
+    print(" Graphical UI: coming soon. Use the TUI (option 1) or the web interface (option 2).")
+    return 0
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -235,14 +250,58 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sub.add_parser("tui", help="Launch the terminal user interface")
     p.set_defaults(func=cmd_tui)
+
+    p = sub.add_parser("web", help="Launch the local web interface in a browser")
+    p.add_argument("--host", default="127.0.0.1")
+    p.add_argument("--port", type=int, default=8765)
+    p.add_argument("--token", default="", help="require this token when sharing over the LAN")
+    p.add_argument("--no-browser", action="store_true")
+    p.set_defaults(func=cmd_web)
+
+    p = sub.add_parser("gui", help="Graphical interface (coming soon)")
+    p.set_defaults(func=cmd_gui)
     return parser
+
+
+def launcher() -> int:
+    """Present the interface chooser when the tool is run with no arguments."""
+    banner = """
+============================================================
+   OST  {v}  -  Office Suite Toolkit
+   by MD. Shakibul Hassan (Shuvo)
+   check * download * install * update * ODT/OCT configurator
+============================================================
+""".format(v=__version__)
+    print(banner)
+    while True:
+        print(" Choose your interface:")
+        print("   1) Terminal UI (TUI)        fast, keyboard-first")
+        print("   2) Web interface            opens in your browser")
+        print("   3) Graphical UI (GUI)       coming soon")
+        print("   0) Quit")
+        try:
+            choice = input("\n Your choice [0/1/2/3]: ").strip().lower()
+        except (EOFError, KeyboardInterrupt):
+            print()
+            return 0
+        if choice in ("1", "t", "tui"):
+            return launch_tui()
+        if choice in ("2", "w", "web"):
+            return cmd_web(argparse.Namespace(host="127.0.0.1", port=8765, token="", no_browser=False))
+        if choice in ("3", "g", "gui"):
+            cmd_gui(argparse.Namespace())
+            print()
+            continue
+        if choice in ("0", "q", "quit", "exit"):
+            return 0
+        print("  Please pick 1, 2, 3 or 0.")
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     if args.command is None:
-        return cmd_tui(args)
+        return launcher()
     return args.func(args)
 
 

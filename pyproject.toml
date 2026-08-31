@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ost"
-version = "0.1.0"
-description = "Office Suite Toolkit: check, download, install, update LibreOffice, Microsoft Office, WPS Office and Apache OpenOffice from official servers. Includes an ODT/OCT-style configurator for Microsoft Office."
+version = "0.2.0"
+description = "Office Suite Toolkit: check, download, install, update LibreOffice, Microsoft Office, WPS Office and Apache OpenOffice from official servers. Includes an ODT/OCT-style configurator for Microsoft Office, a terminal UI and a web interface."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-authors = [{ name = "OST contributors" }]
-keywords = ["office", "libreoffice", "openoffice", "wps", "office-deployment-tool", "tui"]
+authors = [{ name = "MD. Shakibul Hassan (Shuvo)" }]
+keywords = ["office", "libreoffice", "openoffice", "wps", "office-deployment-tool", "tui", "web"]
 classifiers = [
     "Environment :: Console",
     "Operating System :: POSIX :: Linux",
@@ -30,6 +30,7 @@ all = ["textual>=1.0,<9", "httpx>=0.24"]
 [project.scripts]
 ost = "ost.cli:main"
 ost-tui = "ost.tui.app:main"
+ost-web = "ost.web:main"
 
 [tool.setuptools.packages.find]
 include = ["ost*"]
