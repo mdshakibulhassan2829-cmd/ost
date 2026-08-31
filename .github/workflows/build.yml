@@ -1,0 +1,94 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ${{ matrix.asset }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            asset: ost-linux-x86_64
+          - os: windows-latest
+            asset: ost-windows-x86_64.exe
+          - os: macos-latest
+            asset: ost-macos
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: pip install -e ".[all]" pyinstaller
+
+      - name: Build one-file binary
+        run: python -m PyInstaller --noconfirm --clean ost.spec
+
+      - name: Smoke test
+        shell: bash
+        run: |
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then BIN=./dist/ost.exe; else BIN=./dist/ost; fi
+          "$BIN" --version
+          "$BIN" list
+          "$BIN" --help >/dev/null
+
+      - name: Rename artifact
+        shell: bash
+        run: |
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then mv dist/ost.exe "dist/${{ matrix.asset }}"; else mv dist/ost "dist/${{ matrix.asset }}"; fi
+          chmod +x "dist/${{ matrix.asset }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset }}
+          path: dist/${{ matrix.asset }}
+          retention-days: 14
+
+  wheel:
+    name: wheel (py3-none-any)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build wheel
+        run: |
+          pip install --quiet build
+          python -m build --wheel
+      - name: Smoke test wheel
+        run: |
+          pip install --quiet --force-reinstall dist/*.whl
+          ost --version
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheel
+          path: dist/*.whl
+          retention-days: 14
+
+  release:
+    name: publish release assets
+    needs: [build, wheel]
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
+          generate_release_notes: true

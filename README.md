@@ -37,6 +37,39 @@ python -m pip install -e ".[http]"  # optional faster networking (httpx)
 If `httpx` is missing the tool transparently falls back to the Python standard
 library, so `check`/`download` work with zero extra dependencies.
 
+## Binary downloads (no Python needed)
+
+Single-file executables are built by GitHub Actions and published with each
+**release** (tag `v0.1.0`, `v0.1.1`, …). **No Python or pip is required** — just
+download, run, done:
+
+| Platform | Asset | Run |
+|----------|-------|-----|
+| Linux (x86_64) | `ost-linux-x86_64` | `chmod +x ost-linux-x86_64 && ./ost-linux-x86_64` |
+| Windows (x86_64) | `ost-windows-x86_64.exe` | double-click, or `ost-windows-x86_64.exe list` in a terminal |
+| macOS | `ost-macos` | `chmod +x ost-macos && ./ost-macos` |
+
+Each binary opens the **animated TUI by default** when run with no arguments,
+and behaves as the CLI below when given arguments. macOS users on an
+unsigned-notarized binary may need right-click → Open the first time; Windows
+SmartScreen just needs "More info → Run anyway" (signing can be added later if
+you want it gone).
+
+## Android / Termux
+
+Termux uses the official Python wheel instead of a binary (PyInstaller does not
+support Android). On Termux:
+
+```
+pkg install python
+pip install ost                     # installs the latest release wheel
+ost                                 # opens the TUI
+ost check all                       # or use it as the CLI
+```
+
+> Tip: if the latest release wheel isn't on PyPI yet, install straight from the
+> release Assets: `pip install "https://github.com/<user>/ost/releases/download/v0.1.0/ost-0.1.0-py3-none-any.whl[all]"`.
+
 ## CLI
 
 ```
