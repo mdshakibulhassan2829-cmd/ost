@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ost"
+version = "0.1.0"
+description = "Office Suite Toolkit: check, download, install, update LibreOffice, Microsoft Office, WPS Office and Apache OpenOffice from official servers. Includes an ODT/OCT-style configurator for Microsoft Office."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "OST contributors" }]
+keywords = ["office", "libreoffice", "openoffice", "wps", "office-deployment-tool", "tui"]
+classifiers = [
+    "Environment :: Console",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Topic :: System :: Installation/Setup",
+]
+
+dependencies = []
+
+[project.optional-dependencies]
+tui = ["textual>=1.0,<9"]
+http = ["httpx>=0.24"]
+all = ["textual>=1.0,<9", "httpx>=0.24"]
+
+[project.scripts]
+ost = "ost.cli:main"
+ost-tui = "ost.tui.app:main"
+
+[tool.setuptools.packages.find]
+include = ["ost*"]
+
+[tool.setuptools.package-data]
+ost = ["py.typed"]
